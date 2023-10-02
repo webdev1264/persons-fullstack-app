@@ -13,8 +13,6 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const api_key = import.meta.env.VITE_SOME_KEY;
-
   useEffect(() => {
     personService
       .getAll()
@@ -87,8 +85,6 @@ const App = () => {
         setPersons(persons.filter((person) => person.id !== id));
       });
   };
-
-  console.log(api_key);
 
   const filteredPersons = persons.filter((person) => {
     const personName = person.name.toLowerCase();

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:ui": "rm -rf dist && npm run build && cp -r dist ../backend",
+    "deploy:full": "npm run build:ui && cd .. && git add . && git commit -m uibuild && git push",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "server": "json-server -p3001 --watch db.json"
