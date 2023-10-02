@@ -8,6 +8,7 @@ let persons = require("./data/persons");
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static());
 
 //configuring morgan to add body data to the log
 morgan.token("body", (req) => {
