@@ -53,7 +53,7 @@ app.get("/info", (req, res) => {
     });
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
   Person.findById(id)
     .then((person) => {
@@ -63,28 +63,28 @@ app.get("/api/persons/:id", (req, res) => {
       return res.status(404).end();
     })
     .catch((e) => {
-      res.json({ error: e.message });
+      next(e);
     });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
   Person.findByIdAndDelete(id)
     .then((deletedPerson) => {
       res.json(deletedPerson);
     })
     .catch((e) => {
-      res.json({ error: e.message });
+      next(e);
     });
 });
 
-app.post("/api/persons/", (req, res) => {
+app.post("/api/persons/", (req, res, next) => {
   const { name, number } = req.body;
-  if (!name || !number) {
-    return res
-      .status(400)
-      .json({ error: "Input name and number in correct format." });
-  }
+  // if (!name || !number) {
+  //   return res
+  //     .status(400)
+  //     .json({ error: "Input name and number in correct format." });
+  // }
   const person = new Person({
     name,
     number,
@@ -95,14 +95,43 @@ app.post("/api/persons/", (req, res) => {
       res.json(savedPerson);
     })
     .catch((e) => {
-      res.json({ error: e.message });
+      next(e);
     });
 });
 
-const unknownEndpoint = (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id;
+  const body = req.body;
+  Person.findByIdAndUpdate(id, body, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((e) => {
+      next(e);
+    });
+});
+
+app.use((req, res) => {
   res.status(404).json({ error: "Unknown endpoint" });
-};
-app.use(unknownEndpoint);
+});
+
+app.use((error, req, res, next) => {
+  console.log(error.message, error.name);
+
+  if (error.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" });
+  }
+
+  if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message });
+  }
+
+  next(error);
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

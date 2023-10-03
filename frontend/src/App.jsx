@@ -40,7 +40,7 @@ const App = () => {
       );
       if (isConfirm) {
         personService
-          .update(foundPerson.id, { ...foundPerson, number: newNumber })
+          .update(foundPerson.id, { name: foundPerson.name, number: newNumber })
           .then((updatedPerson) => {
             const updatedPersons = persons.map((person) =>
               person.id === updatedPerson.id ? updatedPerson : person
@@ -51,7 +51,7 @@ const App = () => {
           .catch((e) => {
             console.log(e);
             showErrorMessage(
-              `${foundPerson.name} number wasn't added due to error ${e.message}`
+              `${foundPerson.name} number wasn't added due to error ${e.response.data.error}`
             );
           });
       }
@@ -64,7 +64,7 @@ const App = () => {
         })
         .catch((e) => {
           console.log(e);
-          showErrorMessage(`New person wasn't added due to error ${e.message}`);
+          showErrorMessage(`Error ${e.response.data.error}`);
         });
     }
     setNewName("");
